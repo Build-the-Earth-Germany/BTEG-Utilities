@@ -168,7 +168,7 @@ public class Restart {
 		});
 		servers.forEach((k, v) -> {
 			if(!restartedServers.containsKey(k) && (BungeeCord.getInstance().getServers().containsValue(v) && ((whenEmpty && v.getPlayers().size() == 0) || !whenEmpty)) || (k.equals("Proxy-1") && (doProxyRestart || !whenEmpty))) {
-				BungeeCord.getInstance().getPluginManager().dispatchCommand(BungeeCord.getInstance().getConsole(), "cloud service " + k + " restart");
+				BungeeCord.getInstance().getPluginManager().dispatchCommand(BungeeCord.getInstance().getConsole(), "cloud service " + k + (k.equals("Proxy-1") ? " stop" : " restart"));
 				restartedServers.put(k, v);
 			}
 		});
