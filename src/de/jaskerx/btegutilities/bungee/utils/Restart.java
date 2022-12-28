@@ -1,4 +1,4 @@
-package de.jaskerx.btegutilities.bungee.main;
+package de.jaskerx.btegutilities.bungee.utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
+import de.jaskerx.btegutilities.bungee.main.Main;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -38,17 +39,17 @@ public class Restart {
 		this.whenEmpty = whenEmpty;
 		counter = delay;
 		player = p;
-		servers.putAll(getServers(serversArgs));
+		servers.putAll(Servers.fromInput(serversArgs));
 		
 		if(p != null) {
 			if(timerRuns) {
-				p.sendMessage(new ComponentBuilder("§b§lBTEG §7» §6Änderungen §6wurden §6übernommen.").create());
+				p.sendMessage(new ComponentBuilder("Â§bÂ§lBTEG Â§7> Â§6Ã„nderungen Â§6wurden Â§6Ã¼bernommen.").create());
 			}
-			TextComponent comp = new TextComponent("§6oder ");
+			TextComponent comp = new TextComponent("Â§6oder ");
 				comp.setClickEvent(new ClickEvent(Action.RUN_COMMAND, "/bteg restart stop"));
-			p.sendMessage(new ComponentBuilder("§b§lBTEG §7» §9/bteg §9restart §9stop ").append(comp).append("§9hier §6klicken, §6um §6den §6Restart §6folgender §6Server §6abzubrechen:").create());
+			p.sendMessage(new ComponentBuilder("Â§bÂ§lBTEG Â§7> Â§9/bteg Â§9restart Â§9stop ").append(comp).append("Â§9hier Â§6klicken, Â§6um Â§6den Â§6Restart Â§6folgender Â§6Server Â§6abzubrechen:").create());
 			servers.forEach((k, v) -> {
-				p.sendMessage(new ComponentBuilder(" §9" + k).create());
+				p.sendMessage(new ComponentBuilder(" Â§9" + k).create());
 			});
 		}
 		
@@ -82,17 +83,17 @@ public class Restart {
 					int min = (counter / 60) % 60;
 					int s = counter % 60;
 					
-					String hours = "§1hour" + (h != 1 ? "s" : "");
-					String minutes = "§1" + min + " §1minute" + (min != 1 ? "s" : "");
-					String seconds = "§1" + s + " §1second" + (s != 1 ? "s" : "");
+					String hours = "ï¿½1hour" + (h != 1 ? "s" : "");
+					String minutes = "ï¿½1" + min + " ï¿½1minute" + (min != 1 ? "s" : "");
+					String seconds = "ï¿½1" + s + " ï¿½1second" + (s != 1 ? "s" : "");
 										
 					if(counter == delay) {
-						if(p != null) p.sendMessage(new ComponentBuilder("§b§lBTEG §7» §6Restarting §6in §9" + h + ":" + min + ":" + s + " §h").create());
+						if(p != null) p.sendMessage(new ComponentBuilder("Â§bÂ§lBTEG Â§7> Â§6Restarting Â§6in Â§9" + h + ":" + min + ":" + s + " ï¿½h").create());
 					}
 					
 					// hours
 					if(min == 0 && s == 0) {
-						sendMessage(ChatMessageType.CHAT, "§b§lBTEG §7» §cServerrestart §cin §1" + hours + "!");
+						sendMessage(ChatMessageType.CHAT, "Â§bÂ§lBTEG Â§7> Â§cServerrestart Â§cin Â§1" + hours + "!");
 					}
 					
 					// last hour
@@ -100,16 +101,16 @@ public class Restart {
 						
 						// chat	minutes						
 						if((s == 0 && (min == 30 || min == 15 || min == 10 || min == 5 || min == 1)) || (s == 30 && min == 1)) {
-							sendMessage(ChatMessageType.CHAT, "§b§lBTEG §7» §cServerrestart §cin " + minutes + (s != 0 ? " §1and §1" + seconds : "") + "!");
+							sendMessage(ChatMessageType.CHAT, "Â§bÂ§lBTEG Â§7> Â§cServerrestart Â§cin " + minutes + (s != 0 ? " Â§1and Â§1" + seconds : "") + "!");
 						}
 						// chat seconds last minute
 						if(min == 0 && (s == 30 || s <= 15)) {
-							sendMessage(ChatMessageType.CHAT, "§b§lBTEG §7» §cServerrestart §cin " + seconds + "!");
+							sendMessage(ChatMessageType.CHAT, "Â§bÂ§lBTEG Â§7> Â§cServerrestart Â§cin " + seconds + "!");
 						}
 						
 						// action bar
 						if(min < 15) {
-							sendMessage(ChatMessageType.ACTION_BAR, "§c§lServerrestart §c§lin §1" + (min >= 1 ? (s >= 1 ? min + ":" + (s < 10 ? "0" : "") + s + " §1min" : minutes) : seconds));
+							sendMessage(ChatMessageType.ACTION_BAR, "Â§cÂ§lServerrestart Â§cÂ§lin Â§1" + (min >= 1 ? (s >= 1 ? min + ":" + (s < 10 ? "0" : "") + s + " Â§1min" : minutes) : seconds));
 						}						
 					}
 					
@@ -126,43 +127,7 @@ public class Restart {
 		timerRuns = false;
 		counter = 120;
 		if(timer != null) timer.cancel();
-		if(player != null) player.sendMessage(new ComponentBuilder("§b§lBTEG §7» §6Der §6Countdown §6wurde §6abgebrochen.").create());
-	}
-	
-	private Map<String, ServerInfo> getServers(String[] serversArgs) {
-		
-		Map<String, ServerInfo> serversRes = new HashMap<>();
-		for(String s : serversArgs) {
-			s = Character.toUpperCase(s.charAt(0)) + s.toLowerCase().substring(1);
-			Map<String, ServerInfo> servers = BungeeCord.getInstance().getServers();
-			
-			if(s.equalsIgnoreCase("all")) {
-				serversRes.putAll(servers);
-				serversRes.put("Proxy-1", null);
-				break;
-			}
-			
-			String[] filters = new String[] {s + "-1", "Terra-" + s};
-			
-			for(String f : filters) {
-				if(servers.containsKey(f)) {
-					serversRes.put(f, servers.get(f));
-				} else if(f.equals("Proxy-1")) {
-					serversRes.put(f, null);
-				}
-			}
-			
-			if(s.length() == 3 && s.charAt(1) == '-') {
-				String[] range = s.split("-");
-				for(int i = Integer.valueOf(range[0]); i <= Integer.valueOf(range[1]); i++) {
-					if(servers.containsKey("Terra-" + i)) {
-						serversRes.put("Terra-" + i, servers.get("Terra-" + i));
-					}
-				}
-				
-			}
-		}
-		return serversRes;
+		if(player != null) player.sendMessage(new ComponentBuilder("Â§bÂ§lBTEG Â§7> Â§6Der Â§6Countdown Â§6wurde Â§6abgebrochen.").create());
 	}
 	
 	private void sendMessage(ChatMessageType type, String message) {

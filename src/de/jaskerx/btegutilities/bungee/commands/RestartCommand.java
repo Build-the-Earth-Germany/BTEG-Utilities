@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.jaskerx.btegutilities.bungee.main.Main;
-import de.jaskerx.btegutilities.bungee.main.Restart;
+import de.jaskerx.btegutilities.bungee.utils.Restart;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -29,7 +29,7 @@ public class RestartCommand extends Command implements TabExecutor {
 			ProxiedPlayer p = (ProxiedPlayer) sender;
 			
 			if(!p.hasPermission("bteg.restart")) {
-				p.sendMessage(new ComponentBuilder("§b§lBTEG §7» §cDu §cbist §cnicht §cberechtigt, §cdiesen §cCommand §causzuführen!").create());
+				p.sendMessage(new ComponentBuilder("Â§bÂ§lBTEG Â§7> Â§cDu Â§cbist Â§cnicht Â§cberechtigt, Â§cdiesen Â§cCommand Â§causzufÃ¼hren!").create());
 				return;
 			}
 			
@@ -62,10 +62,10 @@ public class RestartCommand extends Command implements TabExecutor {
 					if(Main.restart != null) {
 						Main.restart.stop();
 					}
-					p.sendMessage(new ComponentBuilder("§b§lBTEG §7» §6Die §6Server §6werden §6nicht §6automatisch §6neugestartet.").create());
+					p.sendMessage(new ComponentBuilder("Â§bÂ§lBTEG Â§7> Â§6Die Â§6Server Â§6werden Â§6nicht Â§6automatisch Â§6neugestartet.").create());
 				} else if(args[2].equalsIgnoreCase("start")) {
 					Main.scheduleRestart();
-					p.sendMessage(new ComponentBuilder("§b§lBTEG §7» §6Die §6Server §6werden §6automatisch §6neugestartet.").create());
+					p.sendMessage(new ComponentBuilder("Â§bÂ§lBTEG Â§7> Â§6Die Â§6Server Â§6werden Â§6automatisch Â§6neugestartet.").create());
 				}
 			}
 		}
