@@ -83,12 +83,12 @@ public class Restart {
 					int min = (counter / 60) % 60;
 					int s = counter % 60;
 					
-					String hours = "�1hour" + (h != 1 ? "s" : "");
-					String minutes = "�1" + min + " �1minute" + (min != 1 ? "s" : "");
-					String seconds = "�1" + s + " �1second" + (s != 1 ? "s" : "");
+					String hours = "§1" + h + " §1hour" + (h != 1 ? "s" : "");
+					String minutes = "§1" + min + " §1minute" + (min != 1 ? "s" : "");
+					String seconds = "§1" + s + " §1second" + (s != 1 ? "s" : "");
 										
 					if(counter == delay) {
-						if(p != null) p.sendMessage(new ComponentBuilder("§b§lBTEG §7> §6Restarting §6in §9" + h + ":" + min + ":" + s + " �h").create());
+						if(p != null) p.sendMessage(new ComponentBuilder("§b§lBTEG §7> §6Restarting §6in §9" + h + ":" + min + ":" + s + " §9h").create());
 					}
 					
 					// hours

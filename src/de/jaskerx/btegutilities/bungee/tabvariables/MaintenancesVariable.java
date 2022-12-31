@@ -15,9 +15,9 @@ import de.jaskerx.btegutilities.bungee.main.Main;
 import net.md_5.bungee.BungeeCord;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-public class MaintenanceVariable extends Variable {
+public class MaintenancesVariable extends Variable {
 
-	public MaintenanceVariable() {
+	public MaintenancesVariable() {
 		super("maintenances");
 	}
 

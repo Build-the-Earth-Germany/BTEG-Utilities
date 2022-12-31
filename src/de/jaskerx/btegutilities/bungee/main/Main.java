@@ -28,7 +28,7 @@ import codecrafter47.bungeetablistplus.api.bungee.BungeeTabListPlusAPI;
 import de.jaskerx.btegutilities.bungee.commands.MaintenanceCommand;
 import de.jaskerx.btegutilities.bungee.commands.RestartCommand;
 import de.jaskerx.btegutilities.bungee.listeners.ServerSwitchListener;
-import de.jaskerx.btegutilities.bungee.tabvariables.MaintenanceVariable;
+import de.jaskerx.btegutilities.bungee.tabvariables.MaintenancesVariable;
 import de.jaskerx.btegutilities.bungee.utils.MaintenanceRunnable;
 import de.jaskerx.btegutilities.bungee.utils.Restart;
 import net.md_5.bungee.BungeeCord;
@@ -66,7 +66,7 @@ public class Main extends Plugin {
 	
 	@Override
 	public void onLoad() {
-		BungeeTabListPlusAPI.registerVariable(this, new MaintenanceVariable());
+		BungeeTabListPlusAPI.registerVariable(this, new MaintenancesVariable());
 	}
 	
 	@Override
