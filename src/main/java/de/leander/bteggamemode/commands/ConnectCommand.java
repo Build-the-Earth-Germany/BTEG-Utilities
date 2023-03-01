@@ -56,7 +56,11 @@ public class ConnectCommand implements CommandExecutor {
                         return true;
                     } else {
                         try {
-                            terraform(player, args[0]);
+                            if(args[0].equalsIgnoreCase("plot")){
+                                terraform(player, args[0],true);
+                            }else{
+                                terraform(player, args[0],false);
+                            }
                         } catch (MaxChangedBlocksException | EmptyClipboardException e) {
                             e.printStackTrace();
                         }
@@ -77,7 +81,7 @@ public class ConnectCommand implements CommandExecutor {
         return true;
     }
 
-    void terraform(Player player, String pattern) throws MaxChangedBlocksException, EmptyClipboardException {
+    void terraform(Player player, String pattern, boolean plot) throws MaxChangedBlocksException, EmptyClipboardException {
         Region plotRegion;
         // Get WorldEdit selection of player
         try {
@@ -108,13 +112,13 @@ public class ConnectCommand implements CommandExecutor {
             return;
         }
 
-        line(polyRegion, player, pattern);
+        line(polyRegion, player, pattern,plot);
 
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
 
     }
 
-    private static void line(Region region, Player player, String pattern) throws MaxChangedBlocksException, EmptyClipboardException {
+    private static void line(Region region, Player player, String pattern, boolean plot) throws MaxChangedBlocksException, EmptyClipboardException {
             world1 = player.getWorld();
 
             //WorldEdit CLipboard backup
@@ -138,11 +142,17 @@ public class ConnectCommand implements CommandExecutor {
                 b = new BaseBlock(Integer.parseInt(block[0]));
                 b.setData(Integer.parseInt(block[1]));
             }else{
-                int blockID = Integer.parseInt(pattern);
+                int blockID;
+                if(plot){
+                    blockID = 22;
+                }else{
+                    blockID = Integer.parseInt(pattern);
+                }
                 b = new BaseBlock(blockID);
             }
 
             List<BlockChance> blocks = new ArrayList<BlockChance>();
+
             blocks.add(new BlockChance(b, 1));
 
             RandomFillPattern pat = new RandomFillPattern(blocks); // Create the random pattern
@@ -166,8 +176,13 @@ public class ConnectCommand implements CommandExecutor {
                     localSession.remember(editSession);
                 }
             }
+            if(plot){
+                player.chat("//re !22 82");
+                player.sendMessage("§b§lBTEG §7» §7Successfully prepared plot!");
+            }else{
+                player.sendMessage("§b§lBTEG §7» §7Blocks successfully connected!");
+            }
 
-            player.sendMessage("§b§lBTEG §7» §7Blocks successfully connected!");
 
     }
 
