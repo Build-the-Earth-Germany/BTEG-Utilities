@@ -1,10 +1,10 @@
-package de.jaskerx.btegutilities.bungee.commands;
+package de.jaskerx.bteg.utilities.bungee.commands;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import de.jaskerx.btegutilities.bungee.main.Main;
-import de.jaskerx.btegutilities.bungee.utils.Restart;
+import de.jaskerx.bteg.utilities.bungee.main.Main;
+import de.jaskerx.bteg.utilities.bungee.utils.Restart;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -44,7 +44,7 @@ public class RestartCommand extends Command implements TabExecutor {
 					if(args[3].equalsIgnoreCase("empty")) {
 						restart = new Restart(serversArgs, delay, p, true);
 					} else {
-						delay = Integer.valueOf(args[3]);
+						delay = Integer.parseInt(args[3]);
 						restart = new Restart(serversArgs, delay, p, false);
 					}
 				} else {

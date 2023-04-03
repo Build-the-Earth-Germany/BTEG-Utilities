@@ -1,4 +1,4 @@
-package de.jaskerx.btegutilities.bungee.commands;
+package de.jaskerx.bteg.utilities.bungee.commands;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,12 +7,11 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import de.jaskerx.btegutilities.bungee.main.Main;
-import de.jaskerx.btegutilities.bungee.utils.Servers;
+import de.jaskerx.bteg.utilities.bungee.main.Main;
+import de.jaskerx.bteg.utilities.bungee.utils.Servers;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 
@@ -35,9 +34,7 @@ public class MaintenanceCommand extends Command implements TabExecutor {
 			Map<String, ServerInfo> servers = Servers.fromInput(args[2].split(","));
 			
 			JSONArray arrayServers = new JSONArray();
-			servers.forEach((k, v) -> {
-				arrayServers.put(k);
-			});
+			servers.forEach((k, v) -> arrayServers.put(k));
 			
 			String[] date = args[3].split("\\.");
 			String[] time = args[4].split(":");

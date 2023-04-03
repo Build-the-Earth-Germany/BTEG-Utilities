@@ -1,5 +1,0 @@
-name: BTEGUtilities
-version: 1.0
-main: de.jaskerx.btegutilities.bungee.main.Main
-author: JaskerX
-depends: ['BungeeTabListPlus']
