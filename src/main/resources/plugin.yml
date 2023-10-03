@@ -1,5 +1,5 @@
 name: BTEGUtilities
-version: 1.0
-main: de.jaskerx.bteg.utilities.bungee.main.Main
+version: '${project.version}'
+main: de.jaskerx.bteg.utilities.bungee.BTEGUtilitiesBungeeCord
 author: JaskerX
 depends: ['TAB']

@@ -1,11 +1,17 @@
 package de.jaskerx.bteg.utilities.bungee.listeners;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import de.jaskerx.bteg.utilities.bungee.maintenance.Maintenance;
+import de.jaskerx.bteg.utilities.bungee.registry.MaintenancesRegistry;
+import de.jaskerx.bteg.utilities.bungee.registry.RestartsRegistry;
+import de.jaskerx.bteg.utilities.bungee.restart.Restart;
+import net.md_5.bungee.api.event.ServerConnectedEvent;
+import net.md_5.bungee.api.event.ServerDisconnectEvent;
 
-import de.jaskerx.bteg.utilities.bungee.main.Main;
+import de.jaskerx.bteg.utilities.bungee.BTEGUtilitiesBungeeCord;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -17,57 +23,83 @@ import net.md_5.bungee.event.EventHandler;
 
 public class ServerSwitchListener implements Listener {
 
+	private final RestartsRegistry restartsRegistry;
+	private final MaintenancesRegistry maintenancesRegistry;
+
+	public ServerSwitchListener(RestartsRegistry restartsRegistry, MaintenancesRegistry maintenancesRegistry) {
+		this.restartsRegistry = restartsRegistry;
+		this.maintenancesRegistry = maintenancesRegistry;
+	}
+
+	@EventHandler
+	public void onServerDisconnect(ServerDisconnectEvent event) {
+		ServerInfo serverInfo = event.getTarget();
+		if(serverInfo.getPlayers().size() > 0) {
+			return;
+		}
+		for(Restart restart : this.restartsRegistry.getRestarts().values()) {
+			if(!restart.isWhenEmpty()) {
+				continue;
+			}
+			restart.checkRestart();
+		}
+	}
+
 	@EventHandler
 	public void onServerSwitch(ServerSwitchEvent event) {
-		
-		JSONArray json = Main.json;
-		for(int i = 0; i < json.length(); i++) {
-			JSONObject o = json.getJSONObject(i);
-			JSONArray servers = o.getJSONArray("servers");
-			JSONObject oTime = o.getJSONObject("time");
-			
-			for(int j = 0; j < servers.length(); j++) {
-				
-				if(event.getPlayer().getServer().getInfo().getName().equals(servers.getString(j)) || servers.getString(j).equals("Proxy-1")) {
-					String date = Main.convertDate(oTime.getInt("year"), oTime.getInt("month"), oTime.getInt("day"));
-					String time = oTime.getInt("hour") + ":" + (oTime.getInt("minute") < 10 ? "0" : "") + oTime.getInt("minute");
-					event.getPlayer().sendMessage(new ComponentBuilder("§6Wartungsarbeiten: §c" + date + " §c" + time + " §6" + o.getString("name")).create());
-					break;
-				}
+		for(Maintenance maintenance : this.maintenancesRegistry.getMaintenances().values()) {
+			if(!maintenance.proxy() && maintenance.servers().stream().noneMatch(serverInfo -> serverInfo != null && serverInfo.equals(event.getPlayer().getServer().getInfo()))) {
+				continue;
 			}
+			String date = BTEGUtilitiesBungeeCord.convertDate(maintenance.time().getYear(), maintenance.time().getMonthValue(), maintenance.time().getDayOfMonth());
+			String time = maintenance.time().getHour() + ":" + (maintenance.time().getMinute() < 10 ? "0" : "") + maintenance.time().getMinute();
+			event.getPlayer().sendMessage(new ComponentBuilder("§6Wartungsarbeiten: §c" + date + " §c" + time + " §6" + maintenance.name()).create());
 		}
 	}
 	
 	@EventHandler
 	public void onServerConnect(ServerConnectEvent event) {
-		
-		ProxiedPlayer p = event.getPlayer();
-		ServerInfo target = event.getTarget();
-		
-		if(p.getServer() == null) {
+		ProxiedPlayer player = event.getPlayer();
+
+		if(player.getServer() == null) {
 			return;
 		}
-		
-		JSONArray json = Main.json;
-		for(int i = 0; i < json.length(); i++) {
-			JSONObject o = json.getJSONObject(i);
-			JSONArray servers = o.getJSONArray("servers");
-			JSONObject oTime = o.getJSONObject("time");
-			
-			for(int j = 0; j < servers.length(); j++) {
-				
-				if(target.getName().equals(servers.getString(j))) {
-					LocalDateTime now = LocalDateTime.now();
-					LocalDateTime start = LocalDateTime.of(oTime.getInt("year"), oTime.getInt("month"), oTime.getInt("day"), oTime.getInt("hour"), oTime.getInt("minute"), 0);
 
-					if(now.isAfter(start) && !p.hasPermission("bteg.maintenance.join")) {
-						p.setReconnectServer(ProxyServer.getInstance().getServerInfo("Lobby-1"));
-						event.setCancelled(true);
-						p.sendMessage(new ComponentBuilder("§b§lBTEG §7> §cAuf §cdiesem §cServer §cfinden §czum §caktuellen §cZeitpunkt §cWartungsarbeiten §cstatt! §cBitte §cwarte, §cbis §cdu §cauf §cdiesen §cServer §cwechselst!").create());
-					}
+		for(Maintenance maintenance : this.maintenancesRegistry.getMaintenances().values()) {
+			if(maintenance.servers().stream().noneMatch(serverInfo -> serverInfo != null && serverInfo.equals(event.getTarget()))) {
+				continue;
+			}
+			ZonedDateTime now = LocalDateTime.now(ZoneId.of("Europe/Berlin")).atZone(ZoneId.of("Europe/Berlin"));
+			if(now.isAfter(maintenance.time()) && !player.hasPermission("bteg.maintenance.join")) {
+				event.setCancelled(true);
+				if(maintenance.servers().stream().anyMatch(serverInfo -> serverInfo != null && serverInfo.getName().equals("Lobby-1")) && player.getServer().getInfo().getName().equals("Lobby-1")) {
+					player.disconnect(new ComponentBuilder("Zum aktuellen Zeitpunkt finden Wartungsarbeiten statt!").create());
+					continue;
 				}
+				player.sendMessage(new ComponentBuilder("ᾠ §cAuf §cdiesem §cServer §cfinden §czum §caktuellen §cZeitpunkt §cWartungsarbeiten §cstatt! §cBitte §cwarte, §cbevor §cdu §cauf §cdiesen §cServer §cwechselst!").create());
+				return;
 			}
 		}
 	}
-	
+
+	@EventHandler
+	public void onServerConnnected(ServerConnectedEvent event) {
+		ProxiedPlayer player = event.getPlayer();
+
+		for(Maintenance maintenance : this.maintenancesRegistry.getMaintenances().values()) {
+			if(maintenance.servers().stream().noneMatch(serverInfo -> event.getServer().getInfo().equals(serverInfo))) {
+				continue;
+			}
+			ZonedDateTime now = LocalDateTime.now(ZoneId.of("Europe/Berlin")).atZone(ZoneId.of("Europe/Berlin"));
+			if(now.isAfter(maintenance.time()) && !player.hasPermission("bteg.maintenance.join")) {
+				ServerInfo serverInfoLobby = ProxyServer.getInstance().getServerInfo("Lobby-1");
+				if(serverInfoLobby == null || (maintenance.servers().stream().anyMatch(serverInfo -> serverInfo != null && serverInfo.getName().equals("Lobby-1")) && event.getServer().getInfo().getName().equals("Lobby-1"))) {
+					player.disconnect(new ComponentBuilder("Zum aktuellen Zeitpunkt finden Wartungsarbeiten statt!").create());
+					continue;
+				}
+				player.sendMessage(new ComponentBuilder("ᾠ §cAuf §cdiesem §cServer §cfinden §czum §caktuellen §cZeitpunkt §cWartungsarbeiten §cstatt! §cBitte §cwarte, §cbevor §cdu §cauf §cdiesen §cServer §cwechselst!").create());
+				player.connect(serverInfoLobby);
+			}
+		}
+	}
 }

@@ -1,4 +1,4 @@
-package de.jaskerx.bteg.utilities.bungee.utils;
+package de.jaskerx.bteg.utilities.bungee;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,20 +8,20 @@ import net.md_5.bungee.api.config.ServerInfo;
 
 public class Servers {
 
-	public static Map<String, ServerInfo> fromInput(String[] serversArgs) {
+	public static Map<String, ServerInfo> fromInput(String... serversArgs) {
 		
 		Map<String, ServerInfo> serversRes = new HashMap<>();
-		for(String s : serversArgs) {
-			s = Character.toUpperCase(s.charAt(0)) + s.toLowerCase().substring(1);
+		for(String serverName : serversArgs) {
+			serverName = Character.toUpperCase(serverName.charAt(0)) + serverName.toLowerCase().substring(1);
 			Map<String, ServerInfo> servers = ProxyServer.getInstance().getServers();
 			
-			if(s.equalsIgnoreCase("all")) {
+			if(serverName.equalsIgnoreCase("all")) {
 				serversRes.putAll(servers);
 				serversRes.put("Proxy-1", null);
 				break;
 			}
 			
-			String[] filters = new String[] {s + "-1", "Terra-" + s};
+			String[] filters = new String[] {serverName + "-1", "Terra-" + serverName};
 			
 			for(String f : filters) {
 				if(servers.containsKey(f)) {
@@ -31,8 +31,8 @@ public class Servers {
 				}
 			}
 			
-			if(s.length() == 3 && s.charAt(1) == '-') {
-				String[] range = s.split("-");
+			if(serverName.length() == 3 && serverName.charAt(1) == '-') {
+				String[] range = serverName.split("-");
 				for(int i = Integer.parseInt(range[0]); i <= Integer.parseInt(range[1]); i++) {
 					if(servers.containsKey("Terra-" + i)) {
 						serversRes.put("Terra-" + i, servers.get("Terra-" + i));
