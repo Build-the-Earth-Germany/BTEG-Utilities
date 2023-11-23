@@ -33,7 +33,14 @@ public class Servers {
 			
 			if(serverName.length() == 3 && serverName.charAt(1) == '-') {
 				String[] range = serverName.split("-");
-				for(int i = Integer.parseInt(range[0]); i <= Integer.parseInt(range[1]); i++) {
+				int start = Integer.parseInt(range[0]);
+				int end = Integer.parseInt(range[1]);
+				if(start > end) {
+					int temp = start;
+					start = end;
+					end = temp;
+				}
+				for(int i = start; i <= end; i++) {
 					if(servers.containsKey("Terra-" + i)) {
 						serversRes.put("Terra-" + i, servers.get("Terra-" + i));
 					}

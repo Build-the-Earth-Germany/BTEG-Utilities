@@ -19,6 +19,8 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 
+import javax.annotation.Nullable;
+
 public class RestartCommand extends Command implements TabExecutor {
 
 	private final BTEGUtilitiesBungeeCord plugin;
@@ -193,6 +195,39 @@ public class RestartCommand extends Command implements TabExecutor {
 					result.add("help");
 				}
 			}
+			case 2 -> {
+				if(!args[0].equalsIgnoreCase("server")) {
+					break;
+				}
+				String input = args[1];
+				String lastCharacter = input.length() > 0 ? input.substring(input.length() - 1) : "";
+				switch (lastCharacter) {
+					case "", "," -> {
+						if(lastCharacter.equals("")) {
+							result.add(input + "all");
+						}
+						result.addAll(this.getServersTabCompletionAbbr(false, input));
+					}
+					case "-" -> result.addAll(this.getServersTabCompletionAbbr(true, input));
+					default -> {
+						int indexComma = input.lastIndexOf(",");
+						String inputRelevant = input.substring(indexComma == -1 ? 0 : (indexComma + 1 == input.length() ? indexComma : indexComma + 1));
+						String inputStart = input.substring(0, input.length() - inputRelevant.length());
+						if("all".startsWith(inputRelevant.toLowerCase())) {
+							result.add(inputStart + "all");
+						}
+						if("plot".startsWith(inputRelevant.toLowerCase())) {
+							result.add(inputStart + "plot");
+						}
+						if("lobby".startsWith(inputRelevant.toLowerCase())) {
+							result.add(inputStart + "lobby");
+						}
+						if("proxy".startsWith(inputRelevant.toLowerCase())) {
+							result.add(inputStart + "proxy");
+						}
+					}
+				}
+			}
 			case 3 -> {
 				if("restart".startsWith(args[2].toLowerCase()) && args[0].equalsIgnoreCase("server")) {
 					result.add("restart");
@@ -201,11 +236,48 @@ public class RestartCommand extends Command implements TabExecutor {
 					result.add("cancel");
 				}
 			}
+			case 4 -> {
+				if(!args[0].equalsIgnoreCase("server")) {
+					break;
+				}
+				String input = args[3];
+				if("empty".startsWith(input.toLowerCase())) {
+					result.add("empty");
+					break;
+				}
+				int indexSeconds = input.lastIndexOf("s");
+				int indexMinutes = input.lastIndexOf("m");
+				int indexHours = input.lastIndexOf("h");
+				int highestIndex = Math.max(indexSeconds, Math.max(indexMinutes, indexHours));
+				if(highestIndex == input.length() - 1 && highestIndex > -1) {
+					break;
+				}
+				result.add(input + "s");
+				result.add(input + "m");
+				result.add(input + "h");
+			}
 		}
 
 		return result;
 	}
 	
-	
+	private Set<String> getServersTabCompletionAbbr(boolean onlyTerraServers, @Nullable String input) {
+		boolean appendToInput = input != null;
+		Set<String> serversShort = new HashSet<>();
+		for(String server : ProxyServer.getInstance().getServers().keySet()) {
+			String beginning = "Terra-";
+			if(!server.startsWith(beginning)) {
+				continue;
+			}
+			serversShort.add((appendToInput ? input : "") + server.substring(beginning.length()));
+		}
+		if(onlyTerraServers) {
+			return serversShort;
+		}
+		serversShort.add((appendToInput ? input : "") + "plot");
+		serversShort.add((appendToInput ? input : "") + "lobby");
+		serversShort.add((appendToInput ? input : "") + "proxy");
+		return serversShort;
+	}
 	
 }
