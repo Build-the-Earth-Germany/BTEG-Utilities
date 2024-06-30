@@ -46,7 +46,7 @@ public class RestartCommand extends Command implements TabExecutor {
 			}
 
 			if(args.length == 1 && args[0].equalsIgnoreCase("restarts")) {
-				if(this.restartsRegistry.getRestarts().size() == 0) {
+				if(this.restartsRegistry.getRestarts().isEmpty()) {
 					player.sendMessage(new ComponentBuilder("ᾠ §6Es wurden noch keine Restarts hinzugefügt.").create());
 					return;
 				}
@@ -200,10 +200,10 @@ public class RestartCommand extends Command implements TabExecutor {
 					break;
 				}
 				String input = args[1];
-				String lastCharacter = input.length() > 0 ? input.substring(input.length() - 1) : "";
+				String lastCharacter = !input.isEmpty() ? input.substring(input.length() - 1) : "";
 				switch (lastCharacter) {
 					case "", "," -> {
-						if(lastCharacter.equals("")) {
+						if(lastCharacter.isEmpty()) {
 							result.add(input + "all");
 						}
 						result.addAll(this.getServersTabCompletionAbbr(false, input));
@@ -213,6 +213,10 @@ public class RestartCommand extends Command implements TabExecutor {
 						int indexComma = input.lastIndexOf(",");
 						String inputRelevant = input.substring(indexComma == -1 ? 0 : (indexComma + 1 == input.length() ? indexComma : indexComma + 1));
 						String inputStart = input.substring(0, input.length() - inputRelevant.length());
+						if(inputRelevant.matches("\\d+")) {
+							result.addAll(this.getServersTabCompletionAbbr(true, input.concat("-")));
+							break;
+						}
 						if("all".startsWith(inputRelevant.toLowerCase())) {
 							result.add(inputStart + "all");
 						}
