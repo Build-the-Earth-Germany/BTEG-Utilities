@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BTEGUtilitiesBungeeCord.iml" filepath="$PROJECT_DIR$/BTEGUtilitiesBungeeCord.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bteg-utilities.iml" filepath="$PROJECT_DIR$/bteg-utilities.iml" />
     </modules>
   </component>
 </project>

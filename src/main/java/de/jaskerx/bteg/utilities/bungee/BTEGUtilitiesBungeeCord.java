@@ -11,6 +11,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import de.jaskerx.bteg.utilities.bungee.commands.PlotsCommand;
 import de.jaskerx.bteg.utilities.bungee.maintenance.Maintenance;
 import de.jaskerx.bteg.utilities.bungee.registry.MaintenancesRegistry;
 import de.jaskerx.bteg.utilities.bungee.registry.RestartsRegistry;
@@ -42,6 +43,7 @@ public class BTEGUtilitiesBungeeCord extends Plugin {
 
 		ProxyServer.getInstance().getPluginManager().registerCommand(this, new MaintenanceCommand(maintenancesRegistry));
 		ProxyServer.getInstance().getPluginManager().registerCommand(this, new RestartCommand(this, restartsRegistry, restartsIDsManager));
+		ProxyServer.getInstance().getPluginManager().registerCommand(this, new PlotsCommand());
 
 		ProxyServer.getInstance().registerChannel("Restart");
 		
@@ -51,7 +53,7 @@ public class BTEGUtilitiesBungeeCord extends Plugin {
 		this.scheduleMaintenances(maintenancesRegistry);
 
 		Function<TabPlayer, Object> placeholderFunction = tabPlayer -> {
-			if(maintenancesRegistry.getMaintenances().size() == 0) {
+			if(maintenancesRegistry.getMaintenances().isEmpty()) {
 				return "";
 			}
 
@@ -65,7 +67,7 @@ public class BTEGUtilitiesBungeeCord extends Plugin {
 				String time = maintenance.time().getHour() + ":" + (maintenance.time().getMinute() < 10 ? "0" : "") + maintenance.time().getMinute();
 				builder.append("\n§6").append(maintenance.name()).append(": §c").append(date).append(" §c").append(time);
 			}
-			if(builder.length() == 0) return "";
+			if(builder.isEmpty()) return "";
 
 			builder.insert(0, "\n§6§lGeplante Wartungsarbeiten");
 			builder.append("\n");

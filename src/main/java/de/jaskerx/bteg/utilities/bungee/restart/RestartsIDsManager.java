@@ -21,7 +21,7 @@ public class RestartsIDsManager {
 
     public synchronized void releaseId(int id) {
         this.idsAssigned.remove(Integer.valueOf(id));
-        if(this.idsAssigned.size() == 0) {
+        if(this.idsAssigned.isEmpty()) {
             this.idNext = 0;
             return;
         }
